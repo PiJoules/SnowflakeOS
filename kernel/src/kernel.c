@@ -48,8 +48,8 @@ void kernel_main(multiboot_t* boot, uint32_t magic) {
     init_irq();
     init_syscall();
 
-    init_ps2();
     init_timer();
+    init_ps2();
 
     printk("loading modules");
 
