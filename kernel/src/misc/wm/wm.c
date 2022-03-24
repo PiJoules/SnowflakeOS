@@ -471,6 +471,8 @@ void wm_mouse_callback(mouse_t raw_curr) {
     static mouse_t raw_prev;
     static wm_window_t* dragged = NULL;
     static bool been_dragged = false;
+    static float cumul_dx = 0, cumul_dy = 0;
+    static int32_t initial_x = 0, initial_y = 0;
 
     const mouse_t prev = mouse;
     const float sens = 0.7f;
@@ -496,6 +498,8 @@ void wm_mouse_callback(mouse_t raw_curr) {
         if (clicked) {
             wm_raise_window(clicked);
             dragged = clicked;
+            initial_x = dragged->x;
+            initial_y = dragged->y;
         }
     }
 
@@ -508,8 +512,10 @@ void wm_mouse_callback(mouse_t raw_curr) {
                     rect.top + dy < 0 || rect.bottom + dy >= (int32_t) fb.height)) {
                 been_dragged = true;
 
-                dragged->x += dx;
-                dragged->y += dy;
+                cumul_dx += dx;
+                cumul_dy += dy;
+                dragged->x = initial_x + cumul_dx;
+                dragged->y = initial_y + cumul_dy;
 
                 rect_t new_rect = rect_from_window(dragged);
 
@@ -539,6 +545,10 @@ void wm_mouse_callback(mouse_t raw_curr) {
 
         been_dragged = false;
         dragged = NULL;
+        cumul_dx = 0;
+        cumul_dy = 0;
+        initial_x = 0;
+        initial_y = 0;
     }
 
     // Simple moves
